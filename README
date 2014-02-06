@@ -1,3 +1,7 @@
+This is a work-in-progress version of cgminer for MaxCoin, including everything we have done so far. Feel free to continue development and push those changes in order to help create a working fork of cgminer. 
+
+***
+
 This is a multi-threaded multi-pool GPU, FPGA and ASIC miner with ATI GPU
 monitoring, (over)clocking and fanspeed support for bitcoin and derivative
 coins. Do not use on multiple block chains at the same time!
