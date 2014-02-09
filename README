@@ -1,6 +1,20 @@
-This is a work-in-progress version of cgminer for MaxCoin, including everything we have done so far. Feel free to continue development and push those changes in order to help create a working fork of cgminer. 
+This is a modified cgminer software for Maxcoin stratum mining.
 
-***
+Usage: cgminer --keccak -o stratum+tcp://POOLURL:PORT -u WEBLOGIN.WORKER -p WORKERPASSWORD
+	   cgminer --keccak -o stratum+tcp://maxpool.1gh.com:17333 -u YOUR-WALLET -p x
+
+Developed for MAX.1GH.COM pool by reorder.
+MAX: mdr5rGdv5mq4zniSZDb6FdWnhUjV71C5d9
+BTC: 1QCdQmJYUqJh4NJiPgU3LQzz3atvk58oL3
+
+How to build:
+sh autohen.sh
+./configure --enable-keccak
+make
+
+
+
+Original copyright stack follows
 
 This is a multi-threaded multi-pool GPU, FPGA and ASIC miner with ATI GPU
 monitoring, (over)clocking and fanspeed support for bitcoin and derivative
@@ -11,15 +25,18 @@ time so donations would be greatly appreciated. Please consider donating to the
 address below.
 
 Con Kolivas <kernel@kolivas.org>
-15qSxP1SQcUX3o4nhkfdbgyoWEFMomJ4rZ
+BTC: 15qSxP1SQcUX3o4nhkfdbgyoWEFMomJ4rZ
+
+Egor Melnikov <melnikovegor@me.com>
+CLR: CVmbAqsiUwRGrNXCkQqqUnYBs6b3qbbEYQ
 
 DOWNLOADS:
 
-http://ck.kolivas.org/apps/cgminer
+https://github.com/Eropi4/cgminer_keccak/releases
 
 GIT TREE:
 
-https://github.com/ckolivas/cgminer
+https://github.com/Eropi4/cgminer_keccak
 
 Support thread:
 
@@ -120,7 +137,7 @@ CGMiner specific configuration options:
 	--enable-avalon         Compile support for Avalon (default disabled)
 	--enable-klondike       Compile support for Klondike (default disabled)
 	--enable-scrypt         Compile support for scrypt litecoin mining (default disabled)
-	--enable-keccak         Compile support for keccak MaxCoin mining (default disabled)
+	--enable-keccak         Compile support for keccak copperlark mining (default disabled)
 	--without-curses        Compile support for curses TUI (default enabled)
 
 Basic *nix build instructions:
@@ -169,7 +186,7 @@ Options for both config file and command line:
 --failover-only     Don't leak work to backup pools when primary pool is lagging
 --fix-protocol      Do not redirect to a different getwork protocol (eg. stratum)
 --hotplug <arg>     Set hotplug check time to <arg> seconds (0=never default: 5) - only with libusb
---keccak            Use the keccak algorithm for mining (MaxCoin only)
+--keccak            Use the keccak algorithm for mining (copperlark only)
 --kernel-path|-K <arg> Specify a path to where bitstream and kernel files are (default: "/usr/local/bin")
 --load-balance      Change multipool strategy from failover to quota based balance
 --log|-l <arg>      Interval in seconds between log output (default: 5)

@@ -2020,17 +2020,10 @@ static bool gbt_decode(struct pool *pool, json_t *res_val)
 
 static bool getwork_decode(json_t *res_val, struct work *work)
 {
-#ifdef USE_KECCAK
-	if (unlikely(!jobj_binary(res_val, "data", work->data, opt_keccak ? 80 : sizeof(work->data), true))) {
-		applog(LOG_ERR, "JSON inval data");
-		return false;
-	}
-#else
 	if (unlikely(!jobj_binary(res_val, "data", work->data, sizeof(work->data), true))) {
 		applog(LOG_ERR, "JSON inval data");
 		return false;
 	}
-#endif
 
 	if (!jobj_binary(res_val, "midstate", work->midstate, sizeof(work->midstate), false)) {
 		// Calculate it ourselves
@@ -2725,7 +2718,7 @@ static bool submit_upstream_work(struct work *work, CURL *curl, bool resubmit)
 
 	/* build hex string */
 #ifdef USE_KECCAK
-	hexstr = bin2hex(work->data, opt_keccak ? 80 : sizeof(work->data));
+	hexstr = bin2hex(work->data, /*opt_keccak ? 80 : */sizeof(work->data));
 #else
 	hexstr = bin2hex(work->data, sizeof(work->data));
 #endif
@@ -3089,11 +3082,13 @@ static void calc_diff(struct work *work, int known)
 		double targ = 0;
 		int i;
 
-		for (i = 31; i >= 0; i--) {
+		for (i = 32; i >= 0; i--) {
 			targ *= 256;
 			targ += work->target[i];
 		}
-
+        if (opt_keccak) {
+            targ /= 256;
+        }
 		work->work_difficulty = DIFFEXACTONE / (targ ? : DIFFEXACTONE);
 	} else
 		work->work_difficulty = known;
@@ -5910,6 +5905,8 @@ void set_target(unsigned char *dest_target, double diff)
 		memset(rtarget, 0, 32);
 		if (opt_scrypt)
 			data64 = (uint64_t *)(rtarget + 2);
+        else if (opt_keccak)
+            data64 = (uint64_t *)(rtarget + 3);
 		else
 			data64 = (uint64_t *)(rtarget + 4);
 		*data64 = htobe64(h64);
@@ -5918,6 +5915,8 @@ void set_target(unsigned char *dest_target, double diff)
 		/* Support for the classic all FFs just-below-1 diff */
 		if (opt_scrypt)
 			memset(target, 0xff, 30);
+        else if (opt_keccak)
+            memset(target, 0xff, 29);
 		else
 			memset(target, 0xff, 28);
 	}
@@ -5951,7 +5950,11 @@ static void gen_stratum_work(struct pool *pool, struct work *work)
 	cg_dwlock(&pool->data_lock);
 
 	/* Generate merkle root */
-	gen_hash(pool->coinbase, merkle_root, pool->swork.cb_len);
+    if (opt_keccak) {
+        sha256(pool->coinbase, pool->swork.cb_len, merkle_root);
+    } else {
+	    gen_hash(pool->coinbase, merkle_root, pool->swork.cb_len);
+	}
 	memcpy(merkle_sha, merkle_root, 32);
 	for (i = 0; i < pool->swork.merkles; i++) {
 		memcpy(merkle_sha + 32, pool->swork.merkle_bin[i], 32);
@@ -6095,7 +6098,7 @@ bool test_nonce(struct work *work, uint32_t nonce)
 	rebuild_hash(work);
 	flip32(hash2_32, work->hash);
 
-	diff1targ = opt_scrypt ? 0x0000ffffUL : 0;
+	diff1targ = opt_scrypt ? 0x0000ffffUL : (opt_keccak ? 0x000000ffUL : 0);
 	return (be32toh(hash2_32[7]) <= diff1targ);
 }
 

@@ -117,34 +117,10 @@ __kernel void search(__global const uint2*restrict in, __global uint*restrict ou
 	
 	keccak_block_noabsorb(ARGS_25(&state));
 	
-	state4 = (uint2)(1,0);
-	state5 = 0;
-	state6 = 0;
-	state7 = 0;
-	state8 = 0;
-	state9 = 0;
-	state10 = 0;
-	state11 = 0;
-	state12 = 0;
-	state13 = 0;
-	state14 = 0;
-	state15 = 0;
-	state16 = (uint2)(0,0x80000000U);
-	state17 = 0;
-	state18 = 0;
-	state19 = 0;
-	state20 = 0;
-	state21 = 0;
-	state22 = 0;
-	state23 = 0;
-	state24 = 0;
-	
-	keccak_block_noabsorb(ARGS_25(&state));
-	
 #define FOUND (0x0F)
 #define SETFOUND(Xnonce) output[output[FOUND]++] = Xnonce
         
-        if (state3.y == 0)
+        if ((state3.y & 0xFFFFFFF0U) == 0)
         {
                 SETFOUND(get_global_id(0));
         }

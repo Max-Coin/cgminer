@@ -5,6 +5,8 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <stdio.h>
+
 #define CL_SET_BLKARG(blkvar) status |= clSetKernelArg(*kernel, num++, sizeof(uint), (void *)&blk->blkvar)
 #define CL_SET_ARG(var) status |= clSetKernelArg(*kernel, num++, sizeof(var), (void *)&var)
 
@@ -306,22 +308,24 @@ void keccak1(unsigned char *out, const unsigned char *inraw, unsigned inrawlen)
 	}
 }
 
-static int crypto_hash( unsigned char *out, const unsigned char *in, unsigned inlen )
-{
-	keccak1(out, in, inlen);
-
-	return 0;
-}
-
 void keccak_regenhash(struct work *work)
 {
-	uint256 result;
-        crypto_hash(&result, &work->data[0], &work->data[80]);
+	uint256 result; 
+
+    unsigned int data[20], datacopy[20]; // aligned for flip80
+    memcpy(datacopy, work->data, 80);
+    flip80(data, datacopy); 
+    keccak1((unsigned char*)&result, (unsigned char*)data, 80);
+
 	memcpy(work->hash, &result, 32);
 }
 
 bool keccak_prepare_work(struct thr_info __maybe_unused *thr, struct work *work)
 {
-	memcpy(&work->blk.keccak_data[0], &work->data[0], 80);
+    unsigned int src[20], dst[20]; // aligned for flip80
+    int i;
+    memcpy(src, work->data, 80);
+    flip80(dst, src);
+    memcpy(work->blk.keccak_data, dst, 80);
 	return true;
 }
