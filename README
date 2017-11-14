@@ -1,4 +1,4 @@
-This is a modified cgminer software for Maxcoin stratum mining.
+This is a modified cgminer software for MaxCoin stratum mining.
 
 Usage: cgminer --keccak -o stratum+tcp://POOLURL:PORT -u WEBLOGIN.WORKER -p WORKERPASSWORD
 	   cgminer --keccak -o stratum+tcp://maxpool.1gh.com:17333 -u YOUR-WALLET -p x
@@ -8,7 +8,7 @@ MAX: mdr5rGdv5mq4zniSZDb6FdWnhUjV71C5d9
 BTC: 1QCdQmJYUqJh4NJiPgU3LQzz3atvk58oL3
 
 How to build:
-sh autohen.sh
+sh autogen.sh
 ./configure --enable-keccak
 make
 
